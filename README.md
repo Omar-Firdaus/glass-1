@@ -31,7 +31,9 @@ The flow between input and output is a little long, so here's a chart I made to 
 
 <img width="983" height="601" alt="image" src="https://github.com/user-attachments/assets/2666cbb2-8aa7-40de-90ec-44f2c2531c7f" />
 
-And here's an awesome poster that I designed for the project:
+
+
+And here's an awesome poster that I designed for the project (availabile in pdf in the repo:
 <img width="1410" height="2000" alt="GLASS - 1 (3)" src="https://github.com/user-attachments/assets/ccace629-f7e7-4f80-93a5-a93612df5b59" />
 
 

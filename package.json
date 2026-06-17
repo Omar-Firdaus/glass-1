@@ -1,0 +1,25 @@
+{
+  "name": "glass-1",
+  "version": "0.1.0",
+  "description": "Smart glasses companion app — glass-1",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "setup:muse": "./scripts/setup-muse.sh"
+  },
+  "keywords": [
+    "electron",
+    "smart-glasses",
+    "glass-1"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^35.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "electron-store": "^8.2.0"
+  }
+}

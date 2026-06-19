@@ -1,6 +1,6 @@
 What is GLASS-1: 
 
-GLASS-1 is a pair of smart glasses that takes in data from your brain, camera, and mic, and uses it to do everything from control your smart home to having the answer to any question you see in seconds. By putting the device on your head and opening the app the app on the Raspberry Pi companion, you can control anything around you by thinking and moving. I made GLASS-1 because using touchscreens and keybaords constantly just sucks. Having access to an assitant in your conversation by thinking, or being able to turn off and on light by jsut looking at them and think "on" or "off" feels like superpowers.
+GLASS-1 is a pair of smart glasses that takes in data from your brain, camera, and mic, and uses it to do everything from control your smart home to having the answer to any question you see in seconds. By putting the device on your head and opening the app the app on the Raspberry Pi companion, you can control anything around you by thinking and moving. I made GLASS-1 because using touchscreens and keybaords constantly just sucks. Having access to an assitant in your conversation by thinking, or being able to turn off and on light by just looking at them and think "on" or "off" feels like superpowers.
 
 Here's a diagram of the wiring/connections:
 <img width="1344" height="497" alt="Screenshot 2026-06-18 at 11 41 07 AM" src="https://github.com/user-attachments/assets/3efbd930-4d6e-45a2-b953-87d38c09e67a" />

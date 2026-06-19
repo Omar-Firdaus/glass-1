@@ -4,19 +4,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const existing = await window.glass.getUser();
   if (existing) {
-    window.glass.goDashboard();
+    window.glass.goApp();
     return;
   }
 
   btn.addEventListener('click', async () => {
     btn.disabled = true;
-    btn.textContent = 'Signing in…';
+    btn.textContent = 'Complete sign-in in your browser…';
     errorEl.classList.remove('visible');
 
     const result = await window.glass.login();
 
     if (result.success) {
-      window.glass.goDashboard();
+      window.glass.goApp();
     } else {
       errorEl.textContent = result.error;
       errorEl.classList.add('visible');

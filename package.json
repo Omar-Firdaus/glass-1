@@ -2,11 +2,10 @@
   "name": "glass-1",
   "version": "0.1.0",
   "description": "Smart glasses companion app — glass-1",
-  "main": "electron/main.js",
+  "main": "software/electron/main.js",
   "scripts": {
-    "start": "electron .",
-    "dev": "electron .",
-    "setup:muse": "./scripts/setup-muse.sh"
+    "start": "electron software/electron/main.js",
+    "dev": "electron software/electron/main.js"
   },
   "keywords": [
     "electron",

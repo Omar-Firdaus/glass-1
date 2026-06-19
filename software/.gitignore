@@ -3,6 +3,4 @@ dist/
 .env
 *.log
 .DS_Store
-software/muse/.venv/
-__pycache__/
-*.pyc
+muse/.venv/

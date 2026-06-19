@@ -1,11 +1,16 @@
-const { app, BrowserWindow, ipcMain, shell, nativeImage, systemPreferences, session } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, nativeImage, session } = require('electron');
 const path = require('path');
 const http = require('http');
 const { URL } = require('url');
 require('dotenv').config({ path: path.join(__dirname, '../.env') });
+const { startMuseBridge, stopMuseBridge, registerMuseIpc } = require('./muse-bridge');
+const { registerVisionIpc } = require('./vision');
+const { registerTtsIpc } = require('./tts');
+
+// Running via `electron path/to/main.js` defaults userData to ~/Library/Application Support/Electron.
+app.setName('glass-1');
 
 const Store = require('electron-store');
-const { MuseManager } = require('./muse');
 const store = new Store();
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -18,11 +23,11 @@ const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
 
 let mainWindow = null;
-let authWindow = null;
-let museManager = null;
 
 const iconPath = path.join(__dirname, '../assets/icon.png');
 const appIcon = nativeImage.createFromPath(iconPath);
+const appPage = path.join(__dirname, '../src/app.html');
+const loginPage = path.join(__dirname, '../src/login.html');
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -41,11 +46,7 @@ function createWindow() {
   });
 
   const user = store.get('user');
-  if (user) {
-    mainWindow.loadFile(path.join(__dirname, '../src/dashboard.html'));
-  } else {
-    mainWindow.loadFile(path.join(__dirname, '../src/login.html'));
-  }
+  mainWindow.loadFile(user ? appPage : loginPage);
 }
 
 function buildAuthUrl() {
@@ -145,27 +146,33 @@ async function fetchUserProfile(accessToken) {
   };
 }
 
-function openAuthWindow(authUrl) {
-  authWindow = new BrowserWindow({
-    width: 500,
-    height: 700,
-    parent: mainWindow,
-    modal: true,
-    backgroundColor: '#000000',
-    icon: iconPath,
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-    },
-  });
-
-  authWindow.loadURL(authUrl);
-
-  authWindow.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
-    return { action: 'deny' };
-  });
+async function openAuthInSystemBrowser(authUrl) {
+  // Google blocks OAuth in embedded Electron windows (403 disallowed_useragent).
+  // RFC 8252 requires using the system browser for native app OAuth.
+  await shell.openExternal(authUrl);
 }
+
+const DEFAULT_SETTINGS = {
+  glassesName: 'glass-1',
+  museAutoConnect: false,
+  museSampleRate: 256,
+  cameraAutoStart: false,
+  cameraResolution: '1280x720',
+};
+
+ipcMain.handle('settings:get', () => {
+  return { ...DEFAULT_SETTINGS, ...(store.get('settings') || {}) };
+});
+
+ipcMain.handle('settings:set', (_event, partial) => {
+  const next = { ...DEFAULT_SETTINGS, ...(store.get('settings') || {}), ...partial };
+  store.set('settings', next);
+  return next;
+});
+
+registerMuseIpc(ipcMain, store);
+registerVisionIpc(ipcMain);
+registerTtsIpc(ipcMain);
 
 ipcMain.handle('auth:get-user', () => {
   return store.get('user') || null;
@@ -183,13 +190,9 @@ ipcMain.handle('auth:login', async () => {
   try {
     const codePromise = startCallbackServer();
     const authUrl = buildAuthUrl();
-    openAuthWindow(authUrl);
+    await openAuthInSystemBrowser(authUrl);
 
     const code = await codePromise;
-
-    if (authWindow && !authWindow.isDestroyed()) {
-      authWindow.close();
-    }
 
     const tokens = await exchangeCodeForTokens(code);
     const user = await fetchUserProfile(tokens.access_token);
@@ -203,9 +206,6 @@ ipcMain.handle('auth:login', async () => {
 
     return { success: true, user };
   } catch (err) {
-    if (authWindow && !authWindow.isDestroyed()) {
-      authWindow.close();
-    }
     return { success: false, error: err.message };
   }
 });
@@ -214,101 +214,35 @@ ipcMain.handle('auth:logout', () => {
   store.delete('user');
   store.delete('tokens');
   if (mainWindow) {
-    mainWindow.loadFile(path.join(__dirname, '../src/login.html'));
+    mainWindow.loadFile(loginPage);
   }
   return { success: true };
 });
 
-ipcMain.handle('nav:go-dashboard', () => {
+ipcMain.handle('nav:go-app', () => {
   if (mainWindow) {
-    mainWindow.loadFile(path.join(__dirname, '../src/dashboard.html'));
+    mainWindow.loadFile(appPage);
   }
 });
 
-ipcMain.handle('muse:get-status', () => {
-  return museManager ? museManager.getStatus() : null;
-});
-
-ipcMain.handle('muse:connect-auto', async () => {
-  if (!museManager) return { success: false, error: 'Muse manager not ready' };
-  try {
-    const status = await museManager.connectAuto();
-    return { success: true, status };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
-});
-
-ipcMain.handle('muse:scan', async () => {
-  if (!museManager) return { success: false, error: 'Muse manager not ready' };
-  try {
-    const status = await museManager.scan();
-    return { success: true, status };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
-});
-
-ipcMain.handle('muse:connect', async (_event, { address, name }) => {
-  if (!museManager) return { success: false, error: 'Muse manager not ready' };
-  try {
-    const status = await museManager.connect(address, name);
-    return { success: true, status };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
-});
-
-ipcMain.handle('muse:connect-last', async () => {
-  if (!museManager) return { success: false, error: 'Muse manager not ready' };
-  try {
-    const status = await museManager.connectLast();
-    return { success: true, status };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
-});
-
-ipcMain.handle('muse:disconnect', async () => {
-  if (!museManager) return { success: false, error: 'Muse manager not ready' };
-  try {
-    const status = await museManager.disconnect();
-    return { success: true, status };
-  } catch (err) {
-    return { success: false, error: err.message };
-  }
-});
-
-app.whenReady().then(async () => {
+app.whenReady().then(() => {
   session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
-    callback(permission === 'media' || permission === 'mediaKeySystem');
+    callback(permission === 'media' || permission === 'camera');
   });
-
-  session.defaultSession.setPermissionCheckHandler((_webContents, permission) => {
-    return permission === 'media' || permission === 'mediaKeySystem';
-  });
-
-  if (process.platform === 'darwin') {
-    const cameraStatus = systemPreferences.getMediaAccessStatus('camera');
-    if (cameraStatus !== 'granted') {
-      await systemPreferences.askForMediaAccess('camera');
-    }
-  }
 
   if (process.platform === 'darwin' && app.dock && !appIcon.isEmpty()) {
     app.dock.setIcon(appIcon);
   }
-  museManager = new MuseManager(store, () => mainWindow);
+  startMuseBridge();
   createWindow();
 });
 
-app.on('window-all-closed', () => {
-  if (museManager) museManager.shutdown();
-  if (process.platform !== 'darwin') app.quit();
+app.on('before-quit', () => {
+  stopMuseBridge();
 });
 
-app.on('before-quit', () => {
-  if (museManager) museManager.shutdown();
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') app.quit();
 });
 
 app.on('activate', () => {

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; media-src 'self' blob:"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>glass-1</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/app.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="app-sidebar">
+        <div class="app-sidebar-top">
+          <div class="app-brand">glass-1</div>
+          <nav class="app-nav" aria-label="Main">
+            <button class="app-nav-item active" type="button" data-view="home">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+              </svg>
+              Home
+            </button>
+            <button class="app-nav-item" type="button" data-view="settings">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Settings
+            </button>
+          </nav>
+        </div>
+      </aside>
+
+      <main class="app-main">
+        <section id="view-home" class="view active">
+          <header class="view-header">
+            <h1 class="view-title" id="home-greeting">Welcome back</h1>
+            <p class="view-subtitle">Jaw click to capture · nod or shake to confirm · results spoken with Inworld</p>
+          </header>
+
+          <div class="home-grid">
+            <article class="home-card">
+              <div class="home-card-label">Glasses</div>
+              <div class="home-card-value" id="home-glasses-status">Not connected</div>
+              <p class="home-card-desc">Pair your glasses in Settings → Hardware.</p>
+            </article>
+            <article class="home-card">
+              <div class="home-card-label">Muse EEG</div>
+              <div class="home-card-value" id="home-muse-status">Offline</div>
+              <p class="home-card-desc">Brain-computer interface headset for focus and intent signals.</p>
+            </article>
+            <article class="home-card">
+              <div class="home-card-label">Camera</div>
+              <div class="home-card-value" id="home-camera-status">Off</div>
+              <p class="home-card-desc">OV5640 vision module for scene understanding.</p>
+            </article>
+          </div>
+
+          <section id="vision-panel" class="vision-panel" hidden>
+            <header class="vision-panel-header">
+              <h2 class="vision-panel-title">Vision capture</h2>
+              <span class="status-pill offline" id="vision-state-pill">Idle</span>
+            </header>
+
+            <div class="vision-panel-body">
+              <div class="vision-capture-wrap">
+                <img id="vision-capture-img" class="vision-capture-img" alt="Captured frame" hidden />
+                <p class="vision-capture-placeholder" id="vision-capture-placeholder">No capture yet</p>
+              </div>
+
+              <div class="vision-copy">
+                <p class="vision-prompt" id="vision-prompt">
+                  Jaw click to capture a frame from your camera.
+                </p>
+                <p class="vision-hint" id="vision-hint"></p>
+                <div class="vision-analysis" id="vision-analysis" hidden></div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section id="view-settings" class="view">
+          <div class="settings-layout">
+            <nav class="settings-nav" aria-label="Settings categories">
+              <div class="settings-nav-label">Settings</div>
+              <button class="settings-nav-item active" type="button" data-settings="account">Account</button>
+              <button class="settings-nav-item" type="button" data-settings="hardware">Hardware</button>
+            </nav>
+
+            <div class="settings-content">
+              <div id="settings-account" class="settings-panel active">
+                <header class="settings-header">
+                  <h2 class="settings-title">Account</h2>
+                  <p class="settings-description">Manage your sign-in and profile.</p>
+                </header>
+
+                <div class="settings-section">
+                  <div class="settings-section-label">Profile</div>
+                  <div class="account-card">
+                    <img id="account-avatar" class="account-avatar" alt="" hidden />
+                    <div id="account-avatar-fallback" class="account-avatar fallback">?</div>
+                    <div class="account-info">
+                      <div id="account-name" class="account-name">—</div>
+                      <div id="account-email" class="account-email">—</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="settings-section">
+                  <div class="settings-section-label">Authentication</div>
+                  <div class="setting-row">
+                    <div class="setting-copy">
+                      <div class="setting-label">Signed in with Google</div>
+                      <div class="setting-hint">Your session is stored locally on this device.</div>
+                    </div>
+                    <span class="setting-badge">Connected</span>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-copy">
+                      <div class="setting-label">Sign out</div>
+                      <div class="setting-hint">Return to the sign-in screen on this device.</div>
+                    </div>
+                    <button id="logout-btn" class="btn-secondary" type="button">Sign out</button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="settings-hardware" class="settings-panel">
+                <header class="settings-header">
+                  <h2 class="settings-title">Hardware</h2>
+                  <p class="settings-description">Configure connected devices and sensors.</p>
+                </header>
+
+                <div class="settings-section">
+                  <div class="settings-section-label">Glasses</div>
+                  <div class="setting-row">
+                    <div class="setting-copy">
+                      <div class="setting-label">Device name</div>
+                      <div class="setting-hint">Display name for your paired glasses.</div>
+                    </div>
+                    <input id="setting-glasses-name" class="setting-input" type="text" spellcheck="false" />
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-copy">
+                      <div class="setting-label">Connection status</div>
+                      <div class="setting-hint">Bluetooth link to the glasses frame.</div>
+                    </div>
+                    <span class="status-pill offline" id="hw-glasses-pill">Not connected</span>
+                  </div>
+                </div>
+
+                <div class="settings-section">
+                  <div class="settings-section-label">Muse EEG</div>
+                  <div class="setting-row">
+                    <div class="setting-copy">
+                      <div class="setting-label">Auto-connect on launch</div>
+                      <div class="setting-hint">Scan and connect to your Muse headset when the app opens.</div>
+                    </div>
+                    <label class="toggle">
+                      <input id="setting-muse-auto" type="checkbox" />
+                      <span class="toggle-track" aria-hidden="true"></span>
+                    </label>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-copy">
+                      <div class="setting-label">Sample rate</div>
+                      <div class="setting-hint">EEG data sampling frequency in Hz.</div>
+                    </div>
+                    <select id="setting-muse-rate" class="setting-select">
+                      <option value="256">256 Hz</option>
+                      <option value="512">512 Hz</option>
+                    </select>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-copy">
+                      <div class="setting-label">Headset status</div>
+                      <div class="setting-hint">Muse 2 over Bluetooth.</div>
+                    </div>
+                    <span class="status-pill offline" id="hw-muse-pill">Offline</span>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-copy">
+                      <div class="setting-label">Connection</div>
+                      <div class="setting-hint" id="muse-status-hint">Scan for nearby Muse headbands.</div>
+                    </div>
+                    <div class="muse-actions">
+                      <button id="muse-scan-btn" class="btn-secondary" type="button">Scan</button>
+                      <button id="muse-connect-btn" class="btn-secondary" type="button">Connect</button>
+                      <button id="muse-disconnect-btn" class="btn-secondary" type="button">Disconnect</button>
+                    </div>
+                  </div>
+                  <div class="setting-row muse-device-row" id="muse-device-row" hidden>
+                    <div class="setting-copy">
+                      <div class="setting-label">Available devices</div>
+                      <div class="setting-hint">Select a headband to pair.</div>
+                    </div>
+                    <select id="muse-device-select" class="setting-select muse-device-select"></select>
+                  </div>
+                </div>
+
+                <div class="settings-section muse-panel">
+                  <div class="settings-section-label">Jaw Click (EEG)</div>
+                  <p class="muse-panel-hint" id="muse-jaw-status">
+                    Jaw click: not calibrated. Connect your Muse, then calibrate.
+                  </p>
+
+                    <div class="muse-readouts">
+                    <div class="muse-readout">
+                      <span class="muse-readout-label">Clicks detected</span>
+                      <span class="muse-readout-value" id="muse-click-count">0</span>
+                    </div>
+                    <div class="muse-readout">
+                      <span class="muse-readout-label">Signal score</span>
+                      <span class="muse-readout-value" id="muse-jaw-score">—</span>
+                    </div>
+                    <div class="muse-readout">
+                      <span class="muse-readout-label">Calibration</span>
+                      <span class="status-pill offline" id="muse-calibration-pill">Not calibrated</span>
+                    </div>
+                  </div>
+
+                  <div class="eeg-scope" aria-label="Live EEG channels">
+                    <div class="eeg-scope-label">Live EEG — TP9 · AF7 · AF8 · TP10</div>
+                    <div class="eeg-bars" id="muse-eeg-bars">
+                      <div class="eeg-bar-wrap"><div class="eeg-bar" data-ch="0"></div></div>
+                      <div class="eeg-bar-wrap"><div class="eeg-bar" data-ch="1"></div></div>
+                      <div class="eeg-bar-wrap"><div class="eeg-bar" data-ch="2"></div></div>
+                      <div class="eeg-bar-wrap"><div class="eeg-bar" data-ch="3"></div></div>
+                    </div>
+                    <div class="eeg-channel-values" id="muse-eeg-values">
+                      <span>TP9 —</span>
+                      <span>AF7 —</span>
+                      <span>AF8 —</span>
+                      <span>TP10 —</span>
+                    </div>
+                  </div>
+
+                  <div class="muse-controls">
+                    <button id="muse-calibrate-btn" class="btn-secondary" type="button">
+                      Calibrate Jaw Click
+                    </button>
+                    <div class="jaw-test-box" id="jaw-test-box" aria-live="polite">
+                      <span class="jaw-test-label">Test area</span>
+                      <span class="jaw-test-hint">Firm deliberate clenches only — a flash means click detected</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="settings-section muse-panel">
+                  <div class="settings-section-label">IMU — Head Motion</div>
+                  <p class="muse-panel-hint">Live accelerometer and gyroscope from the Muse headband.</p>
+
+                  <div class="imu-grid">
+                    <div class="imu-scope" aria-label="Accelerometer axes">
+                      <div class="eeg-scope-label">Accelerometer (g)</div>
+                      <div class="imu-axis-list" id="imu-acc-bars">
+                        <div class="imu-axis-row" data-axis="x">
+                          <span class="imu-axis-name">X</span>
+                          <div class="imu-axis-track"><div class="imu-axis-fill"></div></div>
+                        </div>
+                        <div class="imu-axis-row" data-axis="y">
+                          <span class="imu-axis-name">Y</span>
+                          <div class="imu-axis-track"><div class="imu-axis-fill"></div></div>
+                        </div>
+                        <div class="imu-axis-row" data-axis="z">
+                          <span class="imu-axis-name">Z</span>
+                          <div class="imu-axis-track"><div class="imu-axis-fill"></div></div>
+                        </div>
+                      </div>
+                      <div class="imu-axis-values" id="imu-acc-values">
+                        <span>X —</span><span>Y —</span><span>Z —</span>
+                      </div>
+                    </div>
+
+                    <div class="imu-scope" aria-label="Gyroscope axes">
+                      <div class="eeg-scope-label">Gyroscope (°/s)</div>
+                      <div class="imu-axis-list" id="imu-gyro-bars">
+                        <div class="imu-axis-row" data-axis="x">
+                          <span class="imu-axis-name">X</span>
+                          <div class="imu-axis-track"><div class="imu-axis-fill"></div></div>
+                        </div>
+                        <div class="imu-axis-row" data-axis="y">
+                          <span class="imu-axis-name">Y</span>
+                          <div class="imu-axis-track"><div class="imu-axis-fill"></div></div>
+                        </div>
+                        <div class="imu-axis-row" data-axis="z">
+                          <span class="imu-axis-name">Z</span>
+                          <div class="imu-axis-track"><div class="imu-axis-fill"></div></div>
+                        </div>
+                      </div>
+                      <div class="imu-axis-values" id="imu-gyro-values">
+                        <span>X —</span><span>Y —</span><span>Z —</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p class="muse-panel-hint" id="head-gesture-status">
+                    Nod yes when gyro Y ≥ 30 °/s · shake no when gyro Z ≥ 80 °/s. One gesture at a time.
+                  </p>
+                  <div class="head-gesture-thresholds">
+                    <span id="head-y-level">Y peak — / 30</span>
+                    <span id="head-z-level">Z peak — / 80</span>
+                  </div>
+                  <div class="head-gesture-readouts">
+                    <div class="head-gesture-box" id="gesture-yes-box" aria-live="polite">
+                      <span class="head-gesture-label">Yes (nod)</span>
+                      <span class="head-gesture-count" id="nod-count">0</span>
+                    </div>
+                    <div class="head-gesture-box" id="gesture-no-box" aria-live="polite">
+                      <span class="head-gesture-label">No (shake)</span>
+                      <span class="head-gesture-count" id="shake-count">0</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="settings-section">
+                  <div class="settings-section-label">Camera</div>
+                  <div class="setting-row">
+                    <div class="setting-copy">
+                      <div class="setting-label">Auto-start camera</div>
+                      <div class="setting-hint">Begin streaming from the OV5640 module on connect.</div>
+                    </div>
+                    <label class="toggle">
+                      <input id="setting-camera-auto" type="checkbox" />
+                      <span class="toggle-track" aria-hidden="true"></span>
+                    </label>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-copy">
+                      <div class="setting-label">Resolution</div>
+                      <div class="setting-hint">Output size for the vision pipeline.</div>
+                    </div>
+                    <select id="setting-camera-res" class="setting-select">
+                      <option value="640x480">640 × 480</option>
+                      <option value="1280x720">1280 × 720</option>
+                      <option value="1920x1080">1920 × 1080</option>
+                    </select>
+                  </div>
+                  <div class="setting-row">
+                    <div class="setting-copy">
+                      <div class="setting-label">Camera status</div>
+                      <div class="setting-hint">USB-connected OV5640 sensor.</div>
+                    </div>
+                    <span class="status-pill offline" id="hw-camera-pill">Off</span>
+                  </div>
+
+                  <div class="camera-preview-panel">
+                    <div class="eeg-scope-label">Live preview</div>
+                    <div class="camera-preview-wrap">
+                      <video
+                        id="camera-preview"
+                        class="camera-preview"
+                        autoplay
+                        playsinline
+                        muted
+                      ></video>
+                      <p class="camera-preview-placeholder" id="camera-preview-placeholder">
+                        Camera off — click Start to view the stream
+                      </p>
+                    </div>
+                    <p class="camera-preview-hint" id="camera-preview-hint"></p>
+                    <div class="camera-preview-actions">
+                      <button id="camera-start-btn" class="btn-secondary" type="button">Start</button>
+                      <button id="camera-stop-btn" class="btn-secondary" type="button">Stop</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>

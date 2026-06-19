@@ -1,0 +1,4 @@
+muselsl>=2.0.0
+pylsl>=1.16.0
+bleak>=0.21.0
+amused @ git+https://github.com/Amused-EEG/amused-py.git
